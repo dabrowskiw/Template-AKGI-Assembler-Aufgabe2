@@ -127,3 +127,101 @@ class AssemblerTestCase(TestCase):
         graph = assembler.build_graph("data/virus_perfectreads.fasta", 12)
         self.assertEqual(2418, graph.count_nodes())
         self.assertEqual(2418, graph.count_edges())
+
+    @pytest.mark.dbgraph
+    def test_dbgraph_simplify(self):
+        graph = DBGraph()
+        graph.add_kmers(Read([">read", "ATGCGTAGC"]).get_kmers(3))
+        self.assertEqual(7, graph.count_edges())
+        self.assertEqual(7, graph.count_nodes())
+        graph.simplify()
+        self.assertEqual(2, graph.count_edges())
+        self.assertEqual(2, graph.count_nodes())
+
+    @pytest.mark.dbgraph
+    def test_dbgraph_getFASTA(self):
+        graph = DBGraph()
+        graph.add_kmers(Read([">read", "ATGCGTAGC"]).get_kmers(3))
+        graph.simplify()
+        fasta = graph.get_FASTA()
+        seqsInFasta = ["".join([y.strip() for y in x.split("\n")[1:]]) for x in fasta.split(">")[1:]]
+        self.assertTrue(len(seqsInFasta) == 2)
+        self.assertTrue("ATGC" in seqsInFasta, "Expected sequence 'ATGCC' in returned FASTA: \n" + fasta)
+        self.assertTrue("GCGTAGC" in seqsInFasta, "Expected sequence 'GCGTAGC' in returned FASTA: \n" + fasta)
+
+    @pytest.mark.dbgnode
+    def test_dbgnode_can_extend_next(self):
+        node1 = DBGnode("AGA")
+        node2 = DBGnode("GGT")
+        node3 = DBGnode("GTA")
+        node4 = DBGnode("TAG")
+        node5 = DBGnode("AGC")
+        node1.add_edge_to(node2)
+        node2.add_edge_to(node3)
+        node3.add_edge_to(node4)
+        node4.add_edge_to(node1)
+        node4.add_edge_to(node5)
+        node1.add_edge_from(node4)
+        node2.add_edge_from(node1)
+        node3.add_edge_from(node2)
+        node4.add_edge_from(node3)
+        node5.add_edge_from(node4)
+        self.assertTrue(node1.can_extend_next())
+        self.assertTrue(node2.can_extend_next())
+        self.assertTrue(node3.can_extend_next())
+        self.assertFalse(node4.can_extend_next())
+        self.assertFalse(node5.can_extend_next())
+
+
+    @pytest.mark.dbgnode
+    def test_dbgnode_can_extend_prev(self):
+        node1 = DBGnode("AGA")
+        node2 = DBGnode("GGT")
+        node3 = DBGnode("GTA")
+        node4 = DBGnode("TAG")
+        node5 = DBGnode("AGC")
+        node1.add_edge_to(node2)
+        node2.add_edge_to(node3)
+        node3.add_edge_to(node4)
+        node4.add_edge_to(node1)
+        node4.add_edge_to(node5)
+        node1.add_edge_from(node4)
+        node2.add_edge_from(node1)
+        node3.add_edge_from(node2)
+        node4.add_edge_from(node3)
+        node5.add_edge_from(node4)
+        self.assertFalse(node1.can_extend_prev())
+        self.assertTrue(node2.can_extend_prev())
+        self.assertTrue(node3.can_extend_prev())
+        self.assertTrue(node4.can_extend_prev())
+        self.assertFalse(node5.can_extend_prev())
+
+    @pytest.mark.dbgnode
+    def test_dbgnode_extend_next(self):
+        node1 = DBGnode("AGA")
+        node2 = DBGnode("GGT")
+        node3 = DBGnode("GTA")
+        node1.add_edge_to(node2)
+        node2.add_edge_to(node3)
+        node2.add_edge_from(node1)
+        node3.add_edge_from(node2)
+        self.assertEqual(1, node1.get_edge_to_weight(node2))
+        self.assertEqual(0, node1.get_edge_to_weight(node3))
+        node1.extend_next()
+        self.assertEqual(1, node1.get_edge_to_weight(node3))
+        self.assertEqual(0, node1.get_edge_to_weight(node2))
+
+    @pytest.mark.dbgnode
+    def test_dbgnode_extend_prev(self):
+        node1 = DBGnode("AGA")
+        node2 = DBGnode("GGT")
+        node3 = DBGnode("GTA")
+        node1.add_edge_to(node2)
+        node2.add_edge_to(node3)
+        node2.add_edge_from(node1)
+        node3.add_edge_from(node2)
+        self.assertEqual(1, node3.get_edge_from_weight(node2))
+        self.assertEqual(0, node3.get_edge_from_weight(node1))
+        node3.extend_prev()
+        self.assertEqual(1, node3.get_edge_from_weight(node1))
+        self.assertEqual(0, node3.get_edge_from_weight(node2))
