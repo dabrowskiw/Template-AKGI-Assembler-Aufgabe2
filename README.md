@@ -7,10 +7,11 @@ Nachdem Sie einen grundlegenden DBG aufgebaut haben, können Sie daraus nun das 
 Überprüfen Sie zum Verschmelzen für jeden Knoten, ob er mit seinem Vorgänger oder Nachfolger verschmolzen werden kann. Dabei gelten folgende Kriterien:
 
 * Wenn ein Knoten selber mehr als einen Nachfolger (mehr als eine ausgehende Kante) hat, kann er mit keinem Nachfolger verschmolzen werden (es ist nämlich nicht eindeutig, mit welchem)
+* Wenn der Vorgänger A eines Knotens B mehr als einen Nachfolger hat, kann der Knoten B nicht mit seinem Vorgänger verschmolzen werden (sonst wäre nicht klar, was mit der ausgehenden Kante von dem Vorgängerknoten nach dem Verschmelzen passieren soll)
 * Wenn ein Knoten selber mehr als einen Vorgänger (mehr als eine eingehende Kante) hat, kann er mit keinem Vorgänger verschmolzen werden (es ist nämlich wieder nicht eindeutig, mit welchem)
 * Nach Verschmelzung zweier Knoten A und B zu einem neuen Knoten C, wobei A der Vorgänger und B der Nachfolger waren:
-* Sind die eingehenden Kanten von C alle Kanten, die eingehende Kanten von A waren, und die ausgehenden Kanten von C alle Kanten, die ausgehende Kanten von B waren
-* Ist die Sequenz von C die Sequenz von A erweitert um die letzte Base von B
+  * Sind die eingehenden Kanten von C alle Kanten, die eingehende Kanten von A waren, und die ausgehenden Kanten von C alle Kanten, die ausgehende Kanten von B waren
+  * Ist die Sequenz von C die Sequenz von A erweitert um die letzte Base von B
 
 Verschmelzen Sie Knoten in dem Graph so lange, bis keine Knoten mehr verschmolzen werden können (es bietet sich dafür z.B. die Verwendung eines neuen Graphen an: Sie können irgendeinen Knoten aus dem DBG nehmen, ihn so lange nach vorne und hinten verschmelzen, wie möglich, und ihn dann aus dem DBG rausnehmen und in einen neuen Graph/ein neues Set von Knoten packen - das machen Sie so lange, wie noch Knoten im DBG sind; das ist aber nur eine Möglichkeit, wählen Sie eine Herangehensweise, die Ihnen gefällt).
 
