@@ -146,7 +146,7 @@ class AssemblerTestCase(TestCase):
         fasta = graph.get_FASTA()
         seqsInFasta = ["".join([y.strip() for y in x.split("\n")[1:]]) for x in fasta.split(">")[1:]]
         self.assertTrue(len(seqsInFasta) == 2)
-        self.assertTrue("ATGC" in seqsInFasta, "Expected sequence 'ATGCC' in returned FASTA: \n" + fasta)
+        self.assertTrue("ATGC" in seqsInFasta, "Expected sequence 'ATGC' in returned FASTA: \n" + fasta)
         self.assertTrue("GCGTAGC" in seqsInFasta, "Expected sequence 'GCGTAGC' in returned FASTA: \n" + fasta)
 
     @pytest.mark.dbgnode
